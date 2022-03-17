@@ -36,7 +36,7 @@ In the generation process configuration settings are added
 as well as messages which are getting translated into the language
 selected by the user.
 
-The script is meant to run both under python3 2.7 and python3. It tests
+The script is meant to run under python3. It tests
 for the crucial dbus module and if it does not find it and if it is not
 running python3 it will try rerunning iself again with python3.
 """
