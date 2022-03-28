@@ -537,14 +537,19 @@ class InstallerData(object):
             if Config.use_other_tls_id:
                 return True
             out_str = out.decode('utf-8').strip()
-            subject = re.split(r'\s*[/,]\s*',
-                               re.findall(r'subject=/?(.*)$',
-                                          out_str, re.MULTILINE)[0])
+            subject = re.findall(r'subject=/?(.*)$', out_str, re.MULTILINE)[0]
+            print(subject)
+            # a trailing ',' has to be added to allow the following regex to find the last element; all commas are then removed from the fields
+            subject += ","
+            # the following regex matches fields in the form '<name> = <arg>,' 
+            # where <arg> does not contain double quotes or it begins and ends with double quotes with no other in between;
+            subject = re.findall(r"[a-zA-Z]+ = [^\"]+?,|[a-zA-Z]+ = \"[^\"]+?\",", subject)
+            subject = [element[:-1] if element[-1]=="," else element for element in subject]
             cert_prop = {}
             for field in subject:
                 if field:
                     cert_field = re.split(r'\s*=\s*', field)
-                    cert_prop[cert_field[0].lower()] = cert_field[0]
+                    cert_prop.update({cert_field[0].lower(): cert_field[1]})
             if cert_prop['cn'] and re.search(r'@', cert_prop['cn']):
                 debug('Using cn: ' + cert_prop['cn'])
                 self.username = cert_prop['cn']
